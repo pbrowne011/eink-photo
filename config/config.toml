@@ -1,0 +1,15 @@
+[display]
+  width = 800
+  height = 480
+  orientation = "landscape"
+  refresh_hours = 12
+  buffer_size = 10
+
+[server]
+  port = 2323
+  host = "0.0.0.0"
+  max_upload_size_mb = 10
+
+[waveshare]
+  model = "EPD_7in5_V2"
+  rotation = 0

@@ -1,0 +1,29 @@
+# python
+__pycache__/
+*.py[cod]
+env/
+venv/
+.env
+.venv
+ENV/
+*.so
+.coverage
+htmlcov/
+.pytest_cache/
+
+# typescript/js
+node_modules/
+dist/
+build/
+*.js
+*.js.map
+.npm
+.eslintcache
+
+# emacs
+*~
+
+# eink-photos
+uploads/
+static/photos/
+*.log
