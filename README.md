@@ -30,14 +30,14 @@ display.
 ## Project Structure
 ```
 photoframe/
-├── config/           # Configuration files
+├── config/          # Configuration files
 ├── app/             # Python backend
-├── static/          # Frontend assets
-│   ├── css/
-│   └── ts/          # TypeScript sources
-├── templates/       # HTML templates
-├── tests/          # Test suite
-└── photos/         # Photo storage
+│   ├── static/      # Frontend assets
+│   │   ├── css/
+│   │   └── ts/      # TypeScript sources
+│   └── templates/   # HTML templates
+├── tests/           # Test suite
+└── photos/          # Photo storage
     ├── originals/
     └── display/
 ```
@@ -78,30 +78,31 @@ http://photoframe.local:2323
 
 ## Configuration
 
-Key configuration options in `config.yaml`:
+Key configuration options in `config.toml`:
 
-```yaml
-display:
-  orientation: landscape/portrait
-  width: display_width
-  height: display_height
-  refresh_hours: 8
-  buffer_size: 10  # photos before repeat
+```toml
+[display]
+  width = 800
+  height = 480
+  orientation = "landscape"
+  refresh_hours = 12
+  buffer_size = 10            # photos before repeating
 
-paths:
-  originals: /photos/originals
-  display: /photos/display
-  database: /photos/photoframe.db
+[server]
+  port = 2323
+  host = "0.0.0.0"
+  max_upload_size_mb = 10
 
-server:
-  port: 2323
-  host: 0.0.0.0
-  max_upload_size_mb: 10
+[waveshare]
+  model = "EPD_7in5_V2"
+  rotation = 0
 ```
 
 ## Development
 
-1. Setting up development environment: ```bash
+1. Setting up development environment:
+
+```bash
 # Install dev dependencies
 pip install -r requirements-dev.txt npm install --dev
 
@@ -111,12 +112,6 @@ npm run watch
 # Run tests
 pytest
 ```
-
-2. Contributing:
-- Write tests for new features
-- Update documentation
-- Follow existing code style
-- Submit pull requests
 
 ## Testing
 
@@ -133,14 +128,7 @@ pytest --cov=app tests/
 
 ## Deployment
 
-1. Clone repository to Raspberry Pi
-2. Follow setup instructions above
-3. Configure system service:
-```bash
-sudo cp systemd/photoframe.service /etc/systemd/system/
-sudo systemctl enable photoframe
-sudo systemctl start photoframe
-```
+TODO: add setup instructions
 
 ## Troubleshooting
 
@@ -163,12 +151,4 @@ Common issues and solutions:
 
 ## License
 
-MIT License - See LICENSE file for details
-
-## Contributing
-
-Contributions welcome! Please read CONTRIBUTING.md first.
-
-## Credits
-
-Created by [Your Name]
+GNU GPL 3.0
