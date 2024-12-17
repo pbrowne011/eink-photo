@@ -60,8 +60,8 @@ npm install          # For TypeScript dependencies
 
 3. Configure:
 ```bash
-cp config/config.example.yaml config/config.yaml
-# Edit config.yaml with your settings
+cp config/config.example.toml config/config.toml
+# Edit config.toml with your settings
 ```
 
 4. Run development server:

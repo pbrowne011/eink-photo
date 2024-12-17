@@ -29,5 +29,6 @@ def create_app(test_config=None):
     
     from .routes import main
     app.register_blueprint(main)
+    app.display_queue = DisplayQueue(app.config)
     
     return app

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template, send_from_directory
+from flask import Blueprint, request, jsonify, render_template, send_from_directory, current_app
 from pathlib import Path
 import logging
 import os
@@ -7,7 +7,6 @@ logger = logging.getLogger(__name__)
 main = Blueprint('main', __name__)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'heif', 'heic', 'bmp', 'pdf'}
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 UPLOAD_FOLDER = BASE_DIR / 'photos' / 'originals'
 
@@ -79,3 +78,11 @@ def serve_photo(filename):
     except Exception as e:
         logger.error(f'Error serving file {filename}: {e}')
         return jsonify({'error': 'Error serving file'}), 500
+
+@main.route('/queue/status')
+def queue_status():
+    status = current_app.display_queue.get_queue_status()
+    if status:
+        return jsonify(status), 200
+    return jsonify({'error': 'Error getting queue status'}), 500
+    
