@@ -1,5 +1,6 @@
 from flask import Flask
 from pathlib import Path
+# from ./display_queue import DisplayQueue
 import logging
 import tomli
 
@@ -22,13 +23,14 @@ def create_app(test_config=None):
     (photos_dir / "display").mkdir(parents=True, exist_ok=True)
     
     logging.basicConfig(
+        filename="app.log"
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s [%(levelname)s]%-10s %(name)s: %(message)s"
     )
     logger = logging.getLogger(__name__)
     
     from .routes import main
     app.register_blueprint(main)
-    app.display_queue = DisplayQueue(app.config)
+    # app.display_queue = DisplayQueue(app.config)
     
     return app
