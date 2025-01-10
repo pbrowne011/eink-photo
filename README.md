@@ -4,6 +4,24 @@ A lightweight, privacy-focused digital photo frame solution running on Raspberry
 Pi. Upload photos through a simple web interface and display them on an e-paper
 display.
 
+## TODO
+
+  * [ ] Change `routes.py` to work with database (not files)
+  * [ ] Get server running on local machine (use dummy Waveshare cmds)
+  * [ ] Clone on RasPi Zero W and run
+  * [ ] Edit UI features
+    * [ ] Delete -> Select
+    * [ ] When 1 photo is selected, add "Display Now" button
+    * [ ] Lazy load photos on site (paginate? - probably not worth it)
+    * [ ] Cache photos in browser
+  * [ ] Update this README to be relevant
+    * [ ] Add photos of the site
+    * [ ] Add photos of the eink display (with and without frame)
+    * [ ] Add links to documentation to set up the Pi, purchase materials, etc.
+  * [ ] Add steps to configure mDNS to allow for non-IP address website names
+  * [ ] Add reliability to ensure application runs on startup if the Pi is
+        unplugged by accident
+
 ## Features
 
 - Local-only web interface for photo management
