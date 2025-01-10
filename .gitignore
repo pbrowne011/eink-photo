@@ -25,5 +25,5 @@ build/
 
 # eink-photos
 uploads/
-static/photos/
+photos/
 *.log

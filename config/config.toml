@@ -6,7 +6,7 @@
   buffer_size = 10
 
 [server]
-  port = 2323
+  port = 8080
   host = "0.0.0.0"
   max_upload_size_mb = 10
 
