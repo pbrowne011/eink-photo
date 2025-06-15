@@ -1,14 +1,8 @@
 {
     "compilerOptions": {
-        "target": "es2016",
-        "module": "commonjs",
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
+        "target": "es2017",
         "strict": true,
         "outDir": "./app/static/js",
-        "rootDir": "./app/static/ts",
-    },
-    "include": ["app/static/ts/**/*"],
-    "exclude": ["node_modules"]
+        "rootDir": "./app/static/ts"
+    }
 }
