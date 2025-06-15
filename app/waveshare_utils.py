@@ -37,12 +37,22 @@ def convert_for_display(input_path, output_path, config=None):
 def display_image(image_path):
     """Display an image on the e-ink display."""
     try:
+        # Check if image file exists
+        if not Path(image_path).exists():
+            logger.error(f"Image file not found: {image_path}")
+            return False
+            
         if not ENABLE_HARDWARE_DISPLAY:
             logger.info(f"MOCK: Would display image: {image_path}")
             return True
             
         # Hardware display code (only runs on Pi with ENABLE_HARDWARE_DISPLAY=true)
-        from waveshare_epd import epd7in5_V2
+        try:
+            from .lib.waveshare_epd import epd7in5_V2
+        except ImportError:
+            logger.error("Waveshare EPD library not found. Install waveshare-epd or set ENABLE_HARDWARE_DISPLAY=false")
+            return False
+            
         logger.info("Initializing display...")
         epd = epd7in5_V2.EPD()
         epd.init()

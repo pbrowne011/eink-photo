@@ -1,3 +1,4 @@
+-r app/lib/waveshare_epd/requirements.txt
 blinker==1.9.0
 click==8.2.0
 flask==3.1.0

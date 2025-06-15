@@ -42,13 +42,13 @@ def upload_file():
 @main.route('/photos/list')
 def list_photos():
     try:
-        photos = list()
-        for filename in os.listdir(UPLOAD_FOLDER):
-            if allowed_file(filename):
-                photos.append({
-                    'filename': filename,
-                    'path': f'/photos/originals/{filename}'
-                })
+        available_photos = current_app.display_controller.get_available_photos()
+        photos = []
+        for photo in available_photos:
+            photos.append({
+                'filename': photo['filename'],
+                'path': f'/photos/originals/{photo["filename"]}'
+            })
         logger.info(f'Loaded {len(photos)} photos')
         return jsonify(photos)
     except Exception as e:
@@ -58,9 +58,14 @@ def list_photos():
 @main.route('/photos/delete/<filename>', methods=['DELETE'])
 def delete_photo(filename):
     try:
-        file_path =  UPLOAD_FOLDER / filename
+        file_path = UPLOAD_FOLDER / filename
         if file_path.exists():
             file_path.unlink()
+            # Also clean up corresponding display file if it exists
+            display_path = Path('photos/display') / f"{file_path.stem}.bmp"
+            if display_path.exists():
+                display_path.unlink()
+                logger.info(f'Deleted converted file: {display_path}')
             logger.info(f'Deleted file {filename}')
             return jsonify({'message': f'Deleted {filename}'}), 200
         logger.error(f'Error deleting {filename}: file not found')
