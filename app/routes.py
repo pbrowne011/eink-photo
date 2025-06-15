@@ -79,10 +79,30 @@ def serve_photo(filename):
         logger.error(f'Error serving file {filename}: {e}')
         return jsonify({'error': 'Error serving file'}), 500
 
-@main.route('/queue/status')
-def queue_status():
-    status = current_app.display_queue.get_queue_status()
+@main.route('/photos/status')
+def photos_status():
+    status = current_app.display_controller.get_status()
     if status:
         return jsonify(status), 200
-    return jsonify({'error': 'Error getting queue status'}), 500
+    return jsonify({'error': 'Error getting photos status'}), 500
+
+@main.route('/photos/display/<filename>', methods=['POST'])
+def display_photo(filename):
+    try:
+        if current_app.display_controller.display_photo(filename):
+            return jsonify({'message': f'Displaying {filename}'}), 200
+        return jsonify({'error': 'Failed to display photo'}), 500
+    except Exception as e:
+        logger.error(f'Error displaying photo {filename}: {e}')
+        return jsonify({'error': 'Error displaying photo'}), 500
+
+@main.route('/photos/convert/<filename>', methods=['POST'])
+def convert_photo(filename):
+    try:
+        if current_app.display_controller.convert_photo(filename):
+            return jsonify({'message': f'Converted {filename}'}), 200
+        return jsonify({'error': 'Failed to convert photo'}), 500
+    except Exception as e:
+        logger.error(f'Error converting photo {filename}: {e}')
+        return jsonify({'error': 'Error converting photo'}), 500
     

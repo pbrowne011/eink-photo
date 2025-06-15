@@ -1,36 +1,39 @@
 from flask import Flask
 from pathlib import Path
-# from ./display_queue import DisplayQueue
 import logging
 import tomli
 
 def load_config():
-    config_path = Path("config/config.toml")
-    with open(config_path, "rb") as f:
-        return tomli.load(f)
+    try:
+        config_path = Path("config/config.toml")
+        with open(config_path, "rb") as f:
+            return tomli.load(f)
+    except Exception as e:
+        print(f"Unexpected error loading config: {e}")
+        exit(1)
 
-def create_app(test_config=None):
+def create_app():
     app = Flask(__name__)
 
-    if test_config is None:
-        config = load_config()
-        app.config.update(config)
-    else:
-        app.config.update(test_config)
+    config = load_config()
+    app.config.update(config)
     
     photos_dir = Path("photos")
     (photos_dir / "originals").mkdir(parents=True, exist_ok=True)
     (photos_dir / "display").mkdir(parents=True, exist_ok=True)
     
     logging.basicConfig(
-        filename="app.log"
+        filename="app.log",
         level=logging.INFO,
-        format="%(asctime)s [%(levelname)s]%-10s %(name)s: %(message)s"
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
     )
     logger = logging.getLogger(__name__)
     
+    # Initialize display controller
+    from .display import DisplayController
+    app.display_controller = DisplayController(config)
+    
     from .routes import main
     app.register_blueprint(main)
-    # app.display_queue = DisplayQueue(app.config)
     
     return app

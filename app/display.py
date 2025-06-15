@@ -1,106 +1,81 @@
-import threading
-import queue
-import random
-import time
 import logging
 from pathlib import Path
 from .waveshare_utils import convert_for_display, display_image
-from .database import Database
 
 logger = logging.getLogger(__name__)
 
 class DisplayController:
     def __init__(self, app_config):
         self.config = app_config
-        self.db = Database(app_config)
-        self.process_queue = queue.Queue()
+        self.photos_dir = Path("photos")
+        self.originals_dir = self.photos_dir / "originals"
+        self.display_dir = self.photos_dir / "display"
         
-        # Time settings for display rotation (in seconds)
-        self.min_display_time = 8 * 3600  # 8 hours
-        self.max_display_time = 12 * 3600  # 12 hours
-        
-        # Start background tasks
-        self.start_display_thread()
+        # Ensure directories exist
+        self.display_dir.mkdir(parents=True, exist_ok=True)
     
-    def convert_next_photo(self):
-        """Convert next unconverted photo in queue"""
+    def convert_photo(self, filename):
+        """Convert a single photo from originals to display format"""
         try:
-            # Get next unconverted photo from DB
-            photo = self.db.get_next_unconverted_photo()
-            if not photo:
+            input_path = self.originals_dir / filename
+            if not input_path.exists():
+                logger.error(f"Original photo not found: {filename}")
                 return False
                 
-            input_path = Path(photo['original_path'])
-            output_path = Path("photos/display") / f"{input_path.stem}.bmp"
+            output_path = self.display_dir / f"{input_path.stem}.bmp"
             
             if convert_for_display(input_path, output_path, self.config):
-                self.db.update_photo_converted(photo['id'], str(output_path))
-                logger.info(f"Converted {photo['filename']} successfully")
+                logger.info(f"Converted {filename} successfully")
                 return True
             return False
             
         except Exception as e:
-            logger.error(f"Error converting photo: {e}")
+            logger.error(f"Error converting photo {filename}: {e}")
             return False
 
-    def display_next_photo(self):
-        """Display next photo in rotation"""
+    def display_photo(self, filename):
+        """Display a specific photo"""
         try:
-            photo = self.db.get_next_display_photo()
-            if not photo:
-                logger.info("No photos available to display")
-                return False
+            # Check if display version exists, if not convert it
+            display_path = self.display_dir / f"{Path(filename).stem}.bmp"
             
-            if display_image(photo['display_path']):
-                self.db.update_photo_display(photo['id'])
-                logger.info(f"Displayed {photo['filename']}")
+            if not display_path.exists():
+                if not self.convert_photo(filename):
+                    return False
+            
+            if display_image(display_path):
+                logger.info(f"Displayed {filename}")
                 return True
             return False
             
         except Exception as e:
-            logger.error(f"Error displaying photo: {e}")
+            logger.error(f"Error displaying photo {filename}: {e}")
             return False
 
-    def display_manager(self):
-        """Main display loop"""
-        while True:
-            try:
-                # Convert any unconverted photos
-                while self.convert_next_photo():
-                    pass
-                
-                # Display next photo
-                if self.display_next_photo():
-                    # Wait random time before next display
-                    sleep_time = random.uniform(
-                        self.min_display_time,
-                        self.max_display_time
-                    )
-                    logger.info(f"Sleeping for {sleep_time/3600:.1f} hours")
-                    time.sleep(sleep_time)
-                else:
-                    # No photos to display, check again in a minute
-                    time.sleep(60)
-                    
-            except Exception as e:
-                logger.error(f"Error in display manager: {e}")
-                time.sleep(60)  # Wait a bit before retrying
-
-    def start_display_thread(self):
-        """Start the background display thread"""
-        display_thread = threading.Thread(
-            target=self.display_manager,
-            daemon=True
-        )
-        display_thread.start()
-        logger.info("Started display manager thread")
+    def get_available_photos(self):
+        """Get list of available photos in originals directory"""
+        try:
+            photos = []
+            for file_path in self.originals_dir.glob("*"):
+                if file_path.is_file() and file_path.suffix.lower() in {'.png', '.jpg', '.jpeg', '.heif', '.heic', '.bmp', '.pdf'}:
+                    display_path = self.display_dir / f"{file_path.stem}.bmp"
+                    photos.append({
+                        'filename': file_path.name,
+                        'converted': display_path.exists()
+                    })
+            return photos
+        except Exception as e:
+            logger.error(f"Error getting available photos: {e}")
+            return []
 
     def get_status(self):
-        """Get current display queue status"""
+        """Get current status"""
         try:
+            photos = self.get_available_photos()
             return {
-                'queue_size': self.process_queue.qsize(),
-                'photos': self.db.get_queue_stats()
+                'total_photos': len(photos),
+                'converted_photos': sum(1 for p in photos if p['converted']),
+                'photos': photos
             }
         except Exception as e:
             logger.error(f"Error getting status: {e}")

@@ -8,27 +8,24 @@ NC='\033[0m'
 print_status() { echo -e "${GREEN}[*]${NC} $1"; }
 print_error() { echo -e "${RED}[!]${NC} $1"; }
 
-VENV_CREATED=0
-
-if [ ! -d ".venv" ]; then
-    print_status "Creating virtual environment..."
-    python3 -m venv venv
-    VENV_CREATED=1
+if ! command -v uv >/dev/null 2>&1; then
+    print_error "uv is required but not installed."
+    print_error "Please install it with: pip install uv"
+    exit 1
 fi
 
+if [[ ! -d ".venv" ]]; then
+    print_status "Creating virtual environment..."
+    uv venv .venv
+fi
+
+# shellcheck source=/dev/null # added for peace of mind
 source .venv/bin/activate
 
-if [ $VENV_CREATED -eq 1 ]; then
-    print_status "Installing dependencies..."
-    if command -v uv >/dev/null 2>&1; then
-        uv pip install -r requirements.txt
-    else
-        uv pip install --upgrade pip
-        uv pip install -r requirements.txt
-    fi
-fi
+print_status "Checking and installing dependencies with uv..."
+uv pip install -r requirements.txt
 
-if [ ! -f "config/config.toml" ]; then
+if [[ ! -f "config/config.toml" ]]; then
     print_error "config/config.toml not found!"
     print_status "Creating default configuration..."
 
@@ -68,13 +65,14 @@ except Exception as e:
 EOF
 )"
 
-if [ "$CONFIG_LOADED" -ne 1 ]; then
+if [[ "$CONFIG_LOADED" -ne 1 ]]; then
     print_error "Configuration loading failed. Exiting."
     exit 1
 fi
 
 export FLASK_APP="app.server:app"
 export FLASK_ENV="development"
+export FLASK_DEBUG=1
 export PYTHONPATH="$PWD"
 
 print_status "Starting Flask server at http://$FLASK_HOST:$FLASK_PORT"

@@ -1,20 +1,12 @@
 from PIL import Image
-import sys
 import os
 import logging
 from pathlib import Path
 
-# TODO: add necessary lib files to config as a submodule
-# or as standalone code (or rewrite)
-
-# Configure waveshare library path
-WAVESHARE_LIB = Path(__file__).resolve().parent.parent / 'lib'
-if WAVESHARE_LIB.exists():
-    sys.path.append(str(WAVESHARE_LIB))
-
-from waveshare_epd import epd7in5_V2
-
 logger = logging.getLogger(__name__)
+
+# Feature flag for hardware display - set to False for development/testing
+ENABLE_HARDWARE_DISPLAY = os.getenv('ENABLE_HARDWARE_DISPLAY', 'false').lower() == 'true'
 
 def convert_for_display(input_path, output_path, config=None):
     """Convert an image file to BMP format suitable for e-ink display."""
@@ -45,16 +37,17 @@ def convert_for_display(input_path, output_path, config=None):
 def display_image(image_path):
     """Display an image on the e-ink display."""
     try:
-        # TODO: do I need to initialize the display every time?
-        # Should I just do this the first time?
+        if not ENABLE_HARDWARE_DISPLAY:
+            logger.info(f"MOCK: Would display image: {image_path}")
+            return True
+            
+        # Hardware display code (only runs on Pi with ENABLE_HARDWARE_DISPLAY=true)
+        from waveshare_epd import epd7in5_V2
         logger.info("Initializing display...")
         epd = epd7in5_V2.EPD()
         epd.init()
         epd.Clear()
 
-        # TODO: need to make sure this is a valid image
-        # Should not be storing these in the filesystem - from now
-        # on need filenames stored in the Sqlite database
         logger.info(f"Displaying image: {image_path}")
         image = Image.open(image_path)
         epd.display(epd.getbuffer(image))
@@ -65,6 +58,4 @@ def display_image(image_path):
         
     except Exception as e:
         logger.error(f"Display error: {e}")
-        if 'epd' in locals():
-            epd7in5_V2.epdconfig.module_exit(cleanup=True)
         return False
