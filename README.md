@@ -4,6 +4,8 @@ A digital photo display running on a Raspberry Pi. Upload photos through a
 simple web interface and display them on a Waveshare e-paper display.
 
 ## TODO
+  * [ ] Create podman container for users to run if they desire
+  * [ ] Add bun/typescript download to `runserver.sh` (see below)
 
   * [ ] Edit UI features
     * [ ] Lazy load photos on site (paginate? - probably not worth it)
@@ -14,6 +16,21 @@ simple web interface and display them on a Waveshare e-paper display.
     * [ ] Add links to documentation to set up the Pi, purchase materials, etc.
   * [ ] Add steps to configure mDNS to allow for non-IP address website names
   * [ ] Add explanations to code - more documentation is better
+
+### Things to add to `runserver.sh`
+- check if bun is installed
+- echo message "curl -fsSL https://bun.sh/install | bash" if one wants to do it
+  that way
+- add messages warning that this is insecure to script
+
+- add line `bun build ./app/static/ts/upload.ts --outdir ./app/static/js/` to
+- build artifact, add error check
+- add --production flag to this README if not already here
+
+### Podman
+- apparently already included with Raspian?
+  https://forums.raspberrypi.com/viewtopic.php?t=340525
+- site https://podman.io/docs/installation
 
 ## Requirements
 
@@ -110,6 +127,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.bashrc
 
 # Install system dependencies for e-paper display
+# FIXME(pjb) determine if python3-dev includes swig and liblgpio-dev by default
 sudo apt update
 sudo apt install -y python3-dev python3-pip git nginx
 ```

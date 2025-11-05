@@ -99,6 +99,7 @@ setup_nginx() {
 
 # Check if production mode is requested
 if [[ "$1" == "--production" ]]; then
+    export EINK_DISPLAY="true"
     setup_nginx
     print_status "Starting production server with gunicorn at http://$FLASK_HOST:$FLASK_PORT"
     print_status "Access your app at: http://$(hostname).local or http://$(hostname -I | cut -d' ' -f1)"

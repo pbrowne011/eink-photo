@@ -5,8 +5,8 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Feature flag for hardware display - set to False for development/testing
-ENABLE_HARDWARE_DISPLAY = os.getenv('ENABLE_HARDWARE_DISPLAY', 'false').lower() == 'true'
+def _is_eink_enabled():
+    return os.getenv('EINK_DISPLAY', 'false').lower() == 'true'
 
 def convert_for_display(input_path, output_path, config=None):
     """Convert an image file to BMP format suitable for e-ink display."""
@@ -42,15 +42,14 @@ def display_image(image_path):
             logger.error(f"Image file not found: {image_path}")
             return False
             
-        if not ENABLE_HARDWARE_DISPLAY:
+        if not _is_eink_enabled():
             logger.info(f"MOCK: Would display image: {image_path}")
             return True
             
-        # Hardware display code (only runs on Pi with ENABLE_HARDWARE_DISPLAY=true)
         try:
             from .lib.waveshare_epd import epd7in5_V2
         except ImportError:
-            logger.error("Waveshare EPD library not found. Install waveshare-epd or set ENABLE_HARDWARE_DISPLAY=false")
+            logger.error("Waveshare EPD library not found. Install waveshare-epd or set EINK_DISPLAY=false")
             return False
             
         logger.info("Initializing display...")
