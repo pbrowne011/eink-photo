@@ -10,4 +10,4 @@
 
 [waveshare]
   model = "EPD_7in5_V2"
-  rotation = 0
+  rotation = 180

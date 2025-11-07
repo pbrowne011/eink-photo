@@ -102,7 +102,7 @@ class PhotoUploader {
                 this.updateStatus(`Failed to upload ${file.name}: ${data.error}`, 'error');
             }
         } catch (error) {
-            this.updateStatus(`Error uploading ${file.name}`, 'error');
+            this.updateStatus(`Error uploading ${file.name}: ${error}`, 'error');
             console.error('Upload error:', error);
         }
     }

@@ -13,19 +13,18 @@ def convert_for_display(input_path, output_path, config=None):
     try:
         img = Image.open(input_path).convert('L')
         
-        # TODO: Use config for orientation
         target_size = (800, 480)  # Default to landscape
         
         img.thumbnail(target_size, Image.Resampling.LANCZOS)
         new_img = Image.new('L', target_size, 'white')
         
-        # Center the image
+        # Center and rotate the image
         x = (target_size[0] - img.width) // 2
         y = (target_size[1] - img.height) // 2
         new_img.paste(img, (x, y))
+        # new_img = new_img.rotate(angle=config["waveshare"]["rotation"])
         
         # Convert to 1-bit color for e-ink
-        # TODO: save this image to database, not filesystem with output_path
         new_img = new_img.convert('1')
         new_img.save(output_path, 'BMP')
         

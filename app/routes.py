@@ -21,23 +21,27 @@ def index():
 @main.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
+        logger.error("Attempted to upload file, not in request")
         return jsonify({'error': 'No file part'}), 400
     
     file = request.files['file']
     if file.filename == '':
+        logger.error("Filename empty in request")
         return jsonify({'error': 'No selected file'}), 400
         
-    if file and allowed_file(file.filename):
-        try:
-            save_path = Path(UPLOAD_FOLDER) / file.filename
-            file.save(save_path)
-            logger.info(f'Saved file: {save_path}')
-            return jsonify({'message': 'File uploaded successfully'}), 200
-        except Exception as e:
-            logger.error(f'Error saving file: {e}')
-            return jsonify({'error': 'Error saving file'}), 500
-            
-    return jsonify({'error': 'Invalid file type'}), 400
+    if not allowed_file(file.filename):
+        logger.error(f"Invalid file type for file {file.filename}")
+        return jsonify({"error": "Invalid file extension"}), 400
+
+    try:
+        save_path = Path(UPLOAD_FOLDER) / file.filename
+        file.save(save_path)
+    except Exception as e:
+        logger.error(f'Error saving file: {e}')
+        return jsonify({'error': 'Error saving file'}), 500
+
+    logger.info(f'Saved file: {save_path}')
+    return jsonify({'message': 'File uploaded successfully'}), 200
 
 @main.route('/photos/list')
 def list_photos():
