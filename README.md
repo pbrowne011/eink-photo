@@ -4,8 +4,11 @@ A digital photo display running on a Raspberry Pi. Upload photos through a
 simple web interface and display them on a Waveshare e-paper display.
 
 ## TODO
+  * [ ] Figure out why mobile photos aren't rotating - is it size?
   * [ ] Create podman container for users to run if they desire
   * [ ] Add bun/typescript download to `runserver.sh` (see below)
+  * [ ] Figure out how to enable SPI by default on Raspi
+    * [ ] Add SPI issues to documentation, explain how it works in README
 
   * [ ] Edit UI features
     * [ ] Lazy load photos on site (paginate? - probably not worth it)
